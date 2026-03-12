@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>IELTS Reading System - Target 8.5</title>
+    <style>
+        :root { --ielts-teal: #00717a; }
+        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; color: #333; }
+        
+        /* 顶部导航 */
+        header { background: var(--ielts-teal); color: white; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .timer-box { font-size: 1.4em; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 4px; }
+        
+        /* 主体布局 */
+        .main-container { display: flex; flex: 1; overflow: hidden; }
+        .passage, .questions { flex: 1; overflow-y: auto; padding: 40px; }
+        .passage { border-right: 4px solid #f0f0f0; background-color: #fcfcfc; line-height: 1.8; font-size: 17px; }
+        .questions { background-color: white; }
+
+        /* 题目样式 */
+        .q-item { margin-bottom: 20px; padding: 10px; border-radius: 5px; transition: 0.3s; }
+        input[type="text"] { border: 1px solid #ccc; padding: 6px; border-radius: 3px; width: 150px; outline-color: var(--ielts-teal); }
+        
+        /* 判分样式 */
+        .correct { background-color: #e8f5e9; border-left: 5px solid #4caf50; }
+        .incorrect { background-color: #ffebee; border-left: 5px solid #f44336; }
+        .feedback { font-weight: bold; margin-left: 10px; }
+        
+        /* 底部控制栏 */
+        footer { padding: 15px 40px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 20px; }
+        button { padding: 10px 25px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
+        .btn-submit { background: var(--ielts-teal); color: white; }
+        .btn-submit:hover { opacity: 0.9; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <span style="letter-spacing: 1px;">IELTS ACADEMIC READING</span>
+        <div class="timer-box" id="timer">60:00</div>
+    </header>
+
+    <div class="main-container" id="content-area" style="display:none;">
+        <div class="passage">
+            <h2>Reading Passage</h2>
+            <p><strong>The Future of Cities</strong></p>
+            <p>This is a sample text for your IELTS practice. In a real scenario, you would replace this with a passage from Cambridge IELTS 1-18...</p>
+        </div>
+
+        <div class="questions">
+            <h3>Questions 1-3</h3>
+            
+            <div class="q-item" id="item1">
+                1. The author believes cities are <input type="text" class="user-ans" data-answer="complex"> (Answer: complex)
+            </div>
+
+            <div class="q-item" id="item2">
+                2. Population growth is <input type="text" class="user-ans" data-answer="rising"> (Answer: rising)
+            </div>
+
+            <div class="q-item" id="item3">
+                3. Modern technology is <input type="text" class="user-ans" data-answer="essential"> (Answer: essential)
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <button class="btn-submit" onclick="checkAnswers()">Submit & Check</button>
+    </footer>
+
+    <script>
+        // 1. 简易访问密码 (你可以修改 "8585")
+        const pass = prompt("Access Code:");
+        if (pass === "8585") {
+            document.getElementById('content-area').style.display = 'flex';
+        } else {
+            alert("Wrong code.");
+            document.body.innerHTML = "<h1>Unauthorized Access</h1>";
+        }
+
+        // 2. 计时器逻辑
+        let timeLeft = 3600;
+        setInterval(() => {
+            if (timeLeft <= 0) return;
+            timeLeft--;
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }, 1000);
+
+        // 3. 自动判分逻辑
+        function checkAnswers() {
+            const inputs = document.querySelectorAll('.user-ans');
+            let score = 0;
+
+            inputs.forEach(input => {
+                const userAnswer = input.value.trim().toLowerCase();
+                const correctAnswer = input.getAttribute('data-answer').toLowerCase();
+                const parentDiv = input.parentElement;
+
+                if (userAnswer === correctAnswer) {
+                    parentDiv.className = 'q-item correct';
+                    score++;
+                } else {
+                    parentDiv.className = 'q-item incorrect';
+                }
+            });
+
+            alert(`You got ${score} out of ${inputs.length} correct!`);
+        }
+    </script>
+</body>
+</html>
