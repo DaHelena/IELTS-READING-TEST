@@ -3,221 +3,234 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Reading - Custom Highlight Style</title>
+    <title>IELTS Full Test - 40 Questions</title>
     <style>
         :root {
             --ielts-teal: #00717a;
             --bg-grey: #f4f4f4;
             --correct-bg: #e8f5e9;
             --incorrect-bg: #ffebee;
-            /* 修改后的高亮色号 */
-            --highlight-bg: #654321; 
+            --highlight-bg: #654321;
             --highlight-text: #ffffff;
         }
 
         body { margin: 0; font-family: "Arial", sans-serif; display: flex; flex-direction: column; height: 100vh; color: #333; overflow: hidden; }
-        
-        header { background: var(--ielts-teal); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 10; }
+        header { background: var(--ielts-teal); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .timer-display { font-size: 1.3rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 4px; }
 
+        .nav-tabs { background: #eee; display: flex; border-bottom: 1px solid #ddd; }
+        .tab-btn { padding: 12px 30px; border: none; background: none; cursor: pointer; font-weight: bold; color: #666; border-right: 1px solid #ddd; transition: 0.3s; }
+        .tab-btn.active { background: #fff; color: var(--ielts-teal); border-top: 3px solid var(--ielts-teal); }
+
         .main-container { display: flex; flex: 1; overflow: hidden; }
+        .passage-section, .questions-section { display: none; height: 100%; width: 100%; }
+        .passage-section.active, .questions-section.active { display: block; overflow-y: auto; }
+
+        .passage { flex: 1; padding: 40px; background: #fff; border-right: 1px solid #ddd; line-height: 1.8; font-size: 1.05rem; text-align: justify; user-select: text; }
+        .passage h2 { color: var(--ielts-teal); border-bottom: 2px solid var(--ielts-teal); margin-bottom: 20px; }
+        .passage p { margin-bottom: 1.5em; }
+        .ielts-highlight { background-color: var(--highlight-bg); color: var(--highlight-text); cursor: pointer; padding: 1px 0; border-radius: 2px; }
+
+        .questions { flex: 1; padding: 40px; background: var(--bg-grey); }
+        .question-box { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        h3 { border-left: 5px solid var(--ielts-teal); padding-left: 10px; margin-top: 0; }
+        .q-item { margin-bottom: 20px; padding: 10px; border-radius: 4px; border: 1px solid transparent; }
         
-        /* 文章区样式 */
-        .passage { flex: 1; overflow-y: auto; padding: 40px; background: #fff; border-right: 1px solid #ddd; line-height: 1.8; font-size: 1.05rem; text-align: justify; user-select: text; }
-        .passage h2 { color: var(--ielts-teal); border-bottom: 2px solid var(--ielts-teal); padding-bottom: 10px; }
-        .passage p { margin-bottom: 1.5em; position: relative; } 
+        .options-group { display: flex; gap: 15px; margin-top: 10px; }
+        .options-vertical { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+        .options-vertical label { display: block; padding: 8px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; }
+        .fill-blank { border: none; border-bottom: 1px solid #333; width: 180px; outline: none; background: transparent; padding: 2px 5px; }
 
-        /* 高亮文本的样式：深棕底 + 白字 */
-        .ielts-highlight { 
-            background-color: var(--highlight-bg); 
-            color: var(--highlight-text);
-            cursor: pointer; 
-            border-radius: 2px; 
-            padding: 1px 0;
-        }
+        .matching-row { display: flex; gap: 20px; margin-top: 15px; }
+        .drag-questions { flex: 1.2; }
+        .drag-options-pool { flex: 1; background: #f0f0f0; padding: 15px; border: 2px dashed #ccc; border-radius: 8px; }
+        .drop-zone { display: inline-block; width: 45px; height: 32px; background: #e0e0e0; border: 1px inset #999; vertical-align: middle; text-align: center; line-height: 32px; font-weight: bold; color: var(--ielts-teal); border-radius: 4px; }
+        .drag-item { background: white; border: 1px solid #ddd; padding: 8px 12px; margin-bottom: 8px; cursor: grab; border-radius: 4px; font-size: 0.9rem; }
 
-        /* 题目区样式 */
-        .questions { flex: 1; overflow-y: auto; padding: 40px; background: var(--bg-grey); }
-        .question-section { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-        h3 { margin-top: 0; color: #333; border-left: 5px solid var(--ielts-teal); padding-left: 10px; }
-        .instruction { font-style: italic; color: #666; margin-bottom: 20px; font-size: 0.9rem; }
-
-        .q-item { margin-bottom: 25px; padding: 15px; border-radius: 6px; border: 1px solid transparent; transition: 0.3s; }
-        .q-num { font-weight: bold; margin-right: 8px; }
-        
-        .options-group { display: flex; gap: 20px; margin-top: 10px; padding-left: 25px; }
-        .options-group label { cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 0.95rem; }
-        
-        .fill-blank { border: none; border-bottom: 1px solid #333; padding: 2px 5px; width: 250px; font-size: 1rem; outline: none; background: transparent; color: #000; }
-
-        .is-correct { background-color: var(--correct-bg) !important; border: 1px solid #4caf50 !important; }
-        .is-incorrect { background-color: var(--incorrect-bg) !important; border: 1px solid #f44336 !important; }
-
-        footer { padding: 15px 40px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: white; z-index: 10; }
-        .btn-submit { background: var(--ielts-teal); color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+        footer { padding: 15px 40px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: white; z-index: 100; }
+        .btn-submit { background: var(--ielts-teal); color: white; border: none; padding: 12px 30px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <header>
-    <div style="font-weight: bold; letter-spacing: 1px;">ACING IELTS READING WITH HELENA LEE</div>
+    <div style="font-weight: bold; letter-spacing: 1px;">IELTS 60-MIN FULL MOCK TEST</div>
     <div class="timer-display" id="timer">60:00</div>
 </header>
 
+<div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchTab(1)">Passage 1</button>
+    <button class="tab-btn" onclick="switchTab(2)">Passage 2</button>
+    <button class="tab-btn" onclick="switchTab(3)">Passage 3</button>
+</div>
+
 <div class="main-container">
-    <div class="passage" id="passage-content">
-        <h2>Ancient societies classification</h2>
-        <p><strong>A</strong> Sociologists and anthropologists classify societal groups based on their access to resources, prestige, or power. There are typically four classifications of society and this has been true throughout history. At the bottom end of the societal scale are clans, followed by tribes, chiefdoms — and at the highest are the states.</p>
-        <p><strong>B</strong> Clans consist of a small group of people who are typically hunters or gatherers. People in a group tend to number less than 100 and hold no specific home, which allows for flexibility in exploiting the wild and gathering food resources. Members of the clans are typically related to each other through marriage or descent and the group as a whole does not have any formal ranks of leadership. As such, the economic disparity is non-existent between different members due to the vast similarities.</p>
-        <p>Today there are few societal groups that fit the profile, and most are relegated to areas like the Hadza of Tanzania. They are considered to be one of the last hunter-gatherer tribes within the African region and their population numbers 1,300. Experts consider the small group to be very important as they best represent how humans existed and survived in the past. In fact, the Hadza hunters use many of the same methods that were used thousands of years ago. They hunt animals with bows and arrows that are hand-made and create their own shelter with dried grass and branches. As was the case centuries ago, they own very few possessions, especially compared to their modern day counterparts in Western societies.</p>
-        <p>Clans are also very mobile and their short-term homes tend to be composed of seasonally occupied camps and other smaller or more specialised pieces of land. One thing that remains consistent is that clans seek out areas where large mammals can be killed and butchered. Equally as important for clans is access to make tools or perform other sensitive activities.</p>
-        <p><strong>C</strong> Tribes are mostly larger than the mobile hunter-gatherer clan groups and it would be usual for a group to include a population above a few thousand. They tend to nourish mostly on cultivated plants and domesticated animals. People belonging to the tribe societal group are mostly farmers, but could also be nomadic with a mobile economy based on the exploitation of livestock. Tribes are generally multi-community societies, with the individual communities integrated into the large society through kinship ties.</p>
-        <p>Some of the recovered evidence of tribes across the world includes the first farms of the Danube valley in Europe. Others include the Pueblos of the American Southwest, or the early farming village of Catalhoyuk which makes up part of modern Turkey. Although some tribes have officials and even a ‘capital’ or seat of government, such officials lack the economic base necessary for effective use of power.</p>
-        <p><strong>D</strong> Chiefs are graded on a scale of prestige with senior members holding more power. The more senior chiefs are also tasked with governing the society. Prestige and rank are determined by how closely a person is related to a senior chief but there is no true stratification into classes.</p>
-        <p>Chiefs also benefit from living in a centre of power with luxuries others barely have access to, in particular temples and residences. Chiefs obviously benefit the most from their power and prestige through surplus local craft products and food which are paid as a tribute. A chief could then keep the tribute to satisfy workers or redistribute them to his subjects. Chiefdoms typically vary greatly in size from one society to another, but a typical range is between 5,000 and 20,000 people.</p>
-        <p><strong>E</strong> Statesmen share many of the characteristics of a chief but with one key difference. Statesmen tend to have absolute power as a king or a queen, which grants them explicit authority to create laws and enforce them through an armed force. The ruling lineage is viewed as the ultimate owner of the land and their luxuries extend beyond the temples enjoyed by chiefs. This is made possible by lower-ranked people who have an obligation to pay taxes to the statesmen.</p>
-        <p>Statesmen are typically not far removed from capital houses where the bureaucratic administration enforces the collection of revenue and key responsibilities. A centralised location also allows for easier distribution of the revenue to other government members, armed forces, and craft specialists. Early states tend to have developed redistribution systems to best support the essential services and proper functioning of the government.</p>
-        <p><strong>F</strong> Elman Service, William Sanders, and Joseph Marino are experts in the field of societal hierarchy and credited in part with discovering this knowledge. Service provides a good framework to help organise our thoughts on the topic through various papers and books. He, in particular, is credited with developing a ‘managerial benefits’ theory of society which hypothesises that societies with four levels of hierarchy including a centralised leadership were beneficial to all. At the top of the command, the statesmen or leaders offered benefits to the followers and over time these benefits grew in complexity and improved the whole society.</p>
-        <p>Service's research also led him to conclude that class war was not present in ancient civilisation. In fact, those on the lower-end of the societal scale were eager to volunteer and perform tasks instead of being forced to do so by the leadership. He also found that arguments or struggles took place among the political elite.</p>
+    <div class="passage" id="passage-container">
+        <div id="p1-text" class="passage-section active">
+            <h2>Ancient societies classification</h2>
+            <p><strong>A</strong> Sociologists and anthropologists classify societal groups based on their access to resources, prestige, or power. At the bottom end of the societal scale are clans, followed by tribes, chiefdoms — and at the highest are the states.</p>
+            <p><strong>B</strong> Clans consist of a small group of people who are typically hunters or gatherers. Members are typically related to each other through marriage or descent and the group as a whole does not have any formal ranks of leadership. Today there are few societal groups that fit the profile, and most are relegated to areas like the Hadza of Tanzania. They hunt animals with bows and arrows and create their own shelter with dried grass and branches.</p>
+            <p><strong>C</strong> Tribes are mostly larger than clans. They tend to nourish mostly on cultivated plants and domesticated animals. Individual communities integrated through kinship ties.</p>
+            <p><strong>D</strong> Chiefs are graded on a scale of prestige. Prestige and rank are determined by how closely a person is related to a senior chief.</p>
+            <p><strong>E</strong> Statesmen share many of the characteristics of a chief but with one key difference: they tend to have absolute power as a king or a queen. Lower-ranked people have an obligation to pay taxes.</p>
+            <p><strong>F</strong> Elman Service research led him to conclude that class war was not present in ancient civilisation.</p>
+        </div>
+
+        <div id="p2-text" class="passage-section">
+            <h2>Book review on Musicophilia</h2>
+            <p><strong>A</strong> Being a neuroscientist with expertise in auditory learning and memory, I think the brain and music are both enthralling subjects... Consequently, I had high hopes from Oliver's latest work, Musicophilia. But with a sense of guilt, I admit that my reactions to the book are rather ambivalent.</p>
+            <p><strong>B</strong> Sacks himself is a neurologist and prolific author. He has sumptuously chronicled his life... The cover of the book features him wearing headphones... This cover aptly summarises the contents of the book.</p>
+            <p><strong>C</strong> Sacks is torn between the age-old method of observation and the contemporary high-tech approach; he is aware that the modern version is more apt, yet, his heart lies with the traditional one.</p>
+            <p><strong>D</strong> One particular case of Tony Cicoria is especially fascinating, as he is a middle-aged surgeon who is completely nonmusical, but one incident of being struck by lightning produced a deep passion for music in his heart.</p>
+            <p><strong>F</strong> The eighth chapter pertains to ‘amusia,’ an inability to hear sounds like music, and another specific impairment... termed as ‘dysharmonia’.</p>
+            <p><strong>G</strong> Sacks illustrates how music can bring life and movement into patients with severe Parkinson's disease or other body movement disorders...</p>
+        </div>
+
+        <div id="p3-text" class="passage-section">
+            <h2>E-training</h2>
+            <p><strong>A</strong> IBM, for instance, claims that the institution of its e-training program, Basic Blue, whose purpose is to train new managers, saved the company in the range of $200 million in 1999.</p>
+            <p><strong>B</strong> E-learning is widely believed to offer flexible “any time, any place” learning... it definitely has its advantages.</p>
+            <p><strong>C</strong> A California State University Northridge study reported that e-learners performed 20 percent better than traditional learners.</p>
+            <p><strong>D</strong> Costs can top $500,000 in the first year. These kinds of costs mean that custom e-training is, for the time being, an option only for large organizations.</p>
+            <p><strong>E</strong> Bandwidth limitations are still an issue... Furthermore, e-training isn’t suited to every mode of instruction or topic. For instance, it’s rather ineffective imparting cultural values or building teams.</p>
+            <p><strong>F</strong> Nowadays, a go-between style of the Blended learning, which refers to a mixing of different learning environments, is gaining popularity.</p>
+        </div>
     </div>
 
-    <div class="questions">
-        <div class="question-section">
-            <h3>Questions 1-7</h3>
-            <p class="instruction">Select <strong>TRUE, FALSE</strong> or <strong>NOT GIVEN</strong>.</p>
-            <div class="q-item" id="item1"><span class="q-num">1.</span> There is a hierarchy of economic power within clans.
-                <div class="options-group">
-                    <label><input type="radio" name="q1" value="TRUE" data-ans="FALSE"> TRUE</label>
-                    <label><input type="radio" name="q1" value="FALSE" data-ans="FALSE"> FALSE</label>
-                    <label><input type="radio" name="q1" value="NOT GIVEN" data-ans="FALSE"> NOT GIVEN</label>
+    <div class="questions" id="question-container">
+        <div id="q1-area" class="questions-section active">
+            <div class="question-box">
+                <h3>Passage 1: Questions 1-7 (T/F/NG)</h3>
+                <div class="q-item">1. Hierarchy of economic power in clans? <select class="select-ans" data-ans="FALSE"><option value="">-</option><option>TRUE</option><option>FALSE</option><option>NOT GIVEN</option></select></div>
+                <div class="q-item">3. Tribes connected through kinship? <select class="select-ans" data-ans="TRUE"><option value="">-</option><option>TRUE</option><option>FALSE</option><option>NOT GIVEN</option></select></div>
+            </div>
+            <div class="question-box">
+                <h3>Passage 1: Questions 8-13 (Filling)</h3>
+                <div class="q-item">8. Clan connection? <input type="text" class="fill-ans" data-ans="marriage or descent"></div>
+                <div class="q-item">9. Hadza weapon? <input type="text" class="fill-ans" data-ans="bows and arrows"></div>
+                <div class="q-item">13. Service conclusion: No <input type="text" class="fill-ans" data-ans="class war"></div>
+            </div>
+        </div>
+
+        <div id="q2-area" class="questions-section">
+            <div class="question-box">
+                <h3>Passage 2: Questions 14-17 (Choice)</h3>
+                <div class="q-item" id="item14">14. Opinion in Para A?
+                    <div class="options-vertical">
+                        <label><input type="radio" name="q14" value="A" data-ans="A"> A. Mixed feelings.</label>
+                        <label><input type="radio" name="q14" value="D" data-ans="A"> D. Enamoured.</label>
+                    </div>
                 </div>
             </div>
-            <div class="q-item" id="item2"><span class="q-num">2.</span> Only clans are considered nomadic.
-                <div class="options-group">
-                    <label><input type="radio" name="q2" value="TRUE" data-ans="FALSE"> TRUE</label>
-                    <label><input type="radio" name="q2" value="FALSE" data-ans="FALSE"> FALSE</label>
-                    <label><input type="radio" name="q2" value="NOT GIVEN" data-ans="FALSE"> NOT GIVEN</label>
-                </div>
+            <div class="question-box">
+                <h3>Passage 2: Questions 18-23 (Y/N/NG)</h3>
+                <div class="q-item">19. Front cover inadequate? <select class="select-ans" data-ans="NO"><option>-</option><option>YES</option><option>NO</option><option>NOT GIVEN</option></select></div>
+                <div class="q-item">21. Cicoria's cause unknown? <select class="select-ans" data-ans="YES"><option>-</option><option>YES</option><option>NO</option><option>NOT GIVEN</option></select></div>
             </div>
-            <div class="q-item" id="item3"><span class="q-num">3.</span> Tribes are supported by communities of people who are mostly connected through family relationships.
-                <div class="options-group">
-                    <label><input type="radio" name="q3" value="TRUE" data-ans="TRUE"> TRUE</label>
-                    <label><input type="radio" name="q3" value="FALSE" data-ans="TRUE"> FALSE</label>
-                    <label><input type="radio" name="q3" value="NOT GIVEN" data-ans="TRUE"> NOT GIVEN</label>
-                </div>
-            </div>
-            <div class="q-item" id="item4"><span class="q-num">4.</span> In chiefdoms, residents offer items and foodstuffs to the chief.
-                <div class="options-group">
-                    <label><input type="radio" name="q4" value="TRUE" data-ans="TRUE"> TRUE</label>
-                    <label><input type="radio" name="q4" value="FALSE" data-ans="TRUE"> FALSE</label>
-                    <label><input type="radio" name="q4" value="NOT GIVEN" data-ans="TRUE"> NOT GIVEN</label>
-                </div>
-            </div>
-            <div class="q-item" id="item5"><span class="q-num">5.</span> In a state, citizens are considered as owners of the land.
-                <div class="options-group">
-                    <label><input type="radio" name="q5" value="TRUE" data-ans="FALSE"> TRUE</label>
-                    <label><input type="radio" name="q5" value="FALSE" data-ans="FALSE"> FALSE</label>
-                    <label><input type="radio" name="q5" value="NOT GIVEN" data-ans="FALSE"> NOT GIVEN</label>
-                </div>
-            </div>
-            <div class="q-item" id="item6"><span class="q-num">6.</span> Citizens have to pay taxes to their statesmen before they get benefits from their leaders.
-                <div class="options-group">
-                    <label><input type="radio" name="q6" value="TRUE" data-ans="NOT GIVEN"> TRUE</label>
-                    <label><input type="radio" name="q6" value="FALSE" data-ans="NOT GIVEN"> FALSE</label>
-                    <label><input type="radio" name="q6" value="NOT GIVEN" data-ans="NOT GIVEN"> NOT GIVEN</label>
-                </div>
-            </div>
-            <div class="q-item" id="item7"><span class="q-num">7.</span> Early states benefit from their ability to easily redistribute capital.
-                <div class="options-group">
-                    <label><input type="radio" name="q7" value="TRUE" data-ans="TRUE"> TRUE</label>
-                    <label><input type="radio" name="q7" value="FALSE" data-ans="TRUE"> FALSE</label>
-                    <label><input type="radio" name="q7" value="NOT GIVEN" data-ans="TRUE"> NOT GIVEN</label>
+            <div class="question-box">
+                <h3>Passage 2: Questions 24-26 (Drag)</h3>
+                <div class="matching-row">
+                    <div class="drag-questions">
+                        <div class="q-item">24. Ability to state opinions clearly... <div class="drop-zone" data-ans="E"></div></div>
+                        <div class="q-item">25. Difficulty moving flexibly... <div class="drop-zone" data-ans="D"></div></div>
+                        <div class="q-item">26. Fail to fathom harmony... <div class="drop-zone" data-ans="B"></div></div>
+                    </div>
+                    <div class="drag-options-pool">
+                        <div class="drag-item" draggable="true" data-letter="B">B. brain association</div>
+                        <div class="drag-item" draggable="true" data-letter="D">D. Parkinson's disease</div>
+                        <div class="drag-item" draggable="true" data-letter="E">E. cerebral damages/stroke</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="question-section">
-            <h3>Questions 8-13</h3>
-            <p class="instruction">Answer the questions below. Choose <strong>NO MORE THAN THREE WORDS</strong>.</p>
-            <div class="q-item">8. In clans, what makes a group of people connected with each other? <br> <input type="text" class="text-ans fill-blank" data-ans="marriage or descent"> </div>
-            <div class="q-item">9. What do the Hadza use to catch their prey? <br> <input type="text" class="text-ans fill-blank" data-ans="bows and arrows"> </div>
-            <div class="q-item">10. Where in Europe have archaeologists found examples of early farms? <br> <input type="text" class="text-ans fill-blank" data-ans="the Danube valley"> </div>
-            <div class="q-item">11. Which two items do chiefs have available to them that other members of society do not? <br> <input type="text" class="text-ans fill-blank" data-ans="temples and residences"> </div>
-            <div class="q-item">12. What do statesmen possess that differentiates them from chiefs? <br> <input type="text" class="text-ans fill-blank" data-ans="absolute power"> </div>
-            <div class="q-item">13. What did Service discover to be missing in ancient civilisations? <br> <input type="text" class="text-ans fill-blank" data-ans="class war"> </div>
+        <div id="q3-area" class="questions-section">
+            <div class="question-box">
+                <h3>Passage 3: Headings (Drag)</h3>
+                <div class="matching-row">
+                    <div class="drag-questions">
+                        <div class="q-item">28. Para A <div class="drop-zone" data-ans="I"></div></div>
+                        <div class="q-item">29. Para B <div class="drop-zone" data-ans="IX"></div></div>
+                        <div class="q-item">30. Para C <div class="drop-zone" data-ans="IV"></div></div>
+                        <div class="q-item">31. Para D <div class="drop-zone" data-ans="VII"></div></div>
+                    </div>
+                    <div class="drag-options-pool">
+                        <div class="drag-item" draggable="true" data-letter="I">I Overview of benefits</div>
+                        <div class="drag-item" draggable="true" data-letter="IV">IV Learners' achievement</div>
+                        <div class="drag-item" draggable="true" data-letter="VII">VII Financial burden</div>
+                        <div class="drag-item" draggable="true" data-letter="IX">IX Non-economic benefits</div>
+                    </div>
+                </div>
+            </div>
+            <div class="question-box">
+                <h3>Questions 38-40 (Drawbacks)</h3>
+                <div class="options-vertical">
+                    <label><input type="checkbox" name="q38" value="B" data-ans="B"> B. Bandwidth limit</label>
+                    <label><input type="checkbox" name="q38" value="C" data-ans="C"> C. Ineffective for values</label>
+                    <label><input type="checkbox" name="q38" value="E" data-ans="E"> E. More preparation time</label>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <footer>
     <div id="final-score" style="font-weight: bold; color: var(--ielts-teal);"></div>
-    <button class="btn-submit" onclick="submitTest()">Submit & Check Answers</button>
+    <button class="btn-submit" onclick="submitFull()">Submit & Get Score</button>
 </footer>
 
 <script>
-    // 1. 访问控制 (zz2015)
-    const access = prompt("Please enter the access code:");
-    if (access !== "zz2015") {
-        document.body.innerHTML = "<h1 style='text-align:center; margin-top:100px; color:var(--ielts-teal);'>Unauthorized.</h1>";
+    const access = prompt("Code:");
+    if(access !== "zz2015") document.body.innerHTML = "Unauthorized";
+
+    function switchTab(num) {
+        document.querySelectorAll('.passage-section, .questions-section, .tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById(`p${num}-text`).classList.add('active');
+        document.getElementById(`q${num}-area`).classList.add('active');
+        event.currentTarget.classList.add('active');
     }
 
-    // 2. 高亮逻辑
-    const passage = document.getElementById('passage-content');
-    passage.addEventListener('mouseup', function() {
-        const selection = window.getSelection();
-        const selectedText = selection.toString().trim();
-        if (selectedText.length > 0 && selection.rangeCount > 0) {
-            const range = selection.getRangeAt(0);
-            if (range.commonAncestorContainer.parentNode.closest('#passage-content')) {
-                const span = document.createElement('span');
-                span.className = 'ielts-highlight';
-                try { range.surroundContents(span); } catch (e) {}
-                selection.removeAllRanges(); 
-            }
+    // Highlighting (#654321)
+    document.getElementById('passage-container').addEventListener('mouseup', () => {
+        const sel = window.getSelection();
+        if(sel.toString().trim()) {
+            const range = sel.getRangeAt(0);
+            const span = document.createElement('span');
+            span.className = 'ielts-highlight';
+            try { range.surroundContents(span); } catch(e) {}
+            sel.removeAllRanges();
         }
     });
 
-    passage.addEventListener('click', function(e) {
-        if (e.target.classList.contains('ielts-highlight')) {
-            const span = e.target;
-            const textNode = document.createTextNode(span.innerText);
-            span.parentNode.replaceChild(textNode, span);
-            span.parentNode.normalize(); 
-        }
+    // Drag Logic
+    document.querySelectorAll('.drag-item').forEach(item => {
+        item.ondragstart = (e) => e.dataTransfer.setData('text', e.target.getAttribute('data-letter'));
+    });
+    document.querySelectorAll('.drop-zone').forEach(zone => {
+        zone.ondragover = (e) => e.preventDefault();
+        zone.ondrop = (e) => {
+            e.preventDefault();
+            const l = e.dataTransfer.getData('text');
+            e.target.innerText = l;
+            e.target.setAttribute('data-user-ans', l);
+        };
     });
 
-    // 3. 判分逻辑
-    function submitTest() {
-        let score = 0;
-        for(let i=1; i<=7; i++) {
-            const radios = document.getElementsByName('q'+i);
-            const container = document.getElementById('item'+i);
-            let userPick = "";
-            let correctVal = "";
-            radios.forEach(r => { if(r.checked) userPick = r.value; correctVal = r.getAttribute('data-ans'); });
-            if(userPick === correctVal && userPick !== "") { container.className = "q-item is-correct"; score++; }
-            else { container.className = "q-item is-incorrect"; }
-        }
-        const textInputs = document.querySelectorAll('.text-ans');
-        textInputs.forEach(input => {
-            const userVal = input.value.trim().toLowerCase();
-            const correctVal = input.getAttribute('data-ans').toLowerCase();
-            const container = input.closest('.q-item');
-            if(userVal === correctVal && userVal !== "") { container.classList.add('is-correct'); score++; }
-            else { container.classList.add('is-incorrect'); }
-        });
-        document.getElementById('final-score').innerText = `Your Score: ${score} / 13`;
-        alert(`Finished! Score: ${score}/13.`);
+    function submitFull() {
+        let s = 0;
+        document.querySelectorAll('input:checked').forEach(i => { if(i.value === i.getAttribute('data-ans')) s++; });
+        document.querySelectorAll('.fill-ans').forEach(i => { if(i.value.trim().toLowerCase() === i.getAttribute('data-ans').toLowerCase()) s++; });
+        document.querySelectorAll('.select-ans').forEach(sl => { if(sl.value === sl.getAttribute('data-ans')) s++; });
+        document.querySelectorAll('.drop-zone').forEach(z => { if(z.getAttribute('data-user-ans') === z.getAttribute('data-ans')) s++; });
+        
+        document.getElementById('final-score').innerText = `Score: ${s}/40`;
+        alert(`Finished! You scored ${s} out of 40.`);
     }
 
-    // 4. 计时器
-    let time = 3600;
+    let t = 3600;
     setInterval(() => {
-        if(time <= 0) return;
-        time--;
-        let m = Math.floor(time/60);
-        let s = time%60;
-        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        if(t > 0) t--;
+        document.getElementById('timer').innerText = `${Math.floor(t/60)}:${(t%60).toString().padStart(2,'0')}`;
     }, 1000);
 </script>
 </body>
