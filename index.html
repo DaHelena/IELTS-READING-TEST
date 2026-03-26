@@ -2,159 +2,184 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>IELTS Reading System - Target 8.5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IELTS Reading Practice - Ancient Societies</title>
     <style>
-        :root { --ielts-teal: #00717a; }
-        body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; display: flex; flex-direction: column; height: 100vh; color: #333; }
-        
-        /* 顶部导航 */
-        header { background: var(--ielts-teal); color: white; padding: 10px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .timer-box { font-size: 1.4em; font-weight: bold; background: rgba(0,0,0,0.2); padding: 5px 15px; border-radius: 4px; }
-        
-        /* 主体布局 */
-        .main-container { display: flex; flex: 1; overflow: hidden; }
-        .passage, .questions { flex: 1; overflow-y: auto; padding: 40px; }
-        .passage { border-right: 4px solid #f0f0f0; background-color: #fcfcfc; line-height: 1.8; font-size: 17px; }
-        .questions { background-color: white; }
+        :root {
+            --ielts-teal: #00717a;
+            --bg-grey: #f4f4f4;
+            --correct-bg: #e8f5e9;
+            --incorrect-bg: #ffebee;
+        }
 
-        /* 题目样式 */
-        .q-item { margin-bottom: 20px; padding: 10px; border-radius: 5px; transition: 0.3s; }
-        input[type="text"] { border: 1px solid #ccc; padding: 6px; border-radius: 3px; width: 150px; outline-color: var(--ielts-teal); }
+        body { margin: 0; font-family: "Arial", sans-serif; display: flex; flex-direction: column; height: 100vh; color: #333; }
         
-        /* 判分样式 */
-        .correct { background-color: #e8f5e9; border-left: 5px solid #4caf50; }
-        .incorrect { background-color: #ffebee; border-left: 5px solid #f44336; }
-        .feedback { font-weight: bold; margin-left: 10px; }
+        header { background: var(--ielts-teal); color: white; padding: 12px 25px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .timer-display { font-size: 1.3rem; font-weight: bold; background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 4px; }
+
+        .main-container { display: flex; flex: 1; overflow: hidden; }
         
-        /* 底部控制栏 */
-        footer { padding: 15px 40px; border-top: 1px solid #eee; display: flex; justify-content: flex-end; gap: 20px; }
-        button { padding: 10px 25px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; }
-        .btn-submit { background: var(--ielts-teal); color: white; }
-        .btn-submit:hover { opacity: 0.9; }
+        /* 文章区样式 */
+        .passage { flex: 1; overflow-y: auto; padding: 40px; background: #fff; border-right: 1px solid #ddd; line-height: 1.8; font-size: 1.05rem; text-align: justify; }
+        .passage h2 { color: var(--ielts-teal); border-bottom: 2px solid var(--ielts-teal); padding-bottom: 10px; }
+        .passage p { margin-bottom: 1.5em; } /* 段落空一行 */
+
+        /* 题目区样式 */
+        .questions { flex: 1; overflow-y: auto; padding: 40px; background: var(--bg-grey); }
+        .question-section { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        h3 { margin-top: 0; color: #333; border-left: 5px solid var(--ielts-teal); padding-left: 10px; }
+        .instruction { font-style: italic; color: #666; margin-bottom: 20px; font-size: 0.9rem; }
+
+        .q-item { margin-bottom: 20px; padding: 10px; border-radius: 4px; transition: 0.3s; }
+        .q-num { font-weight: bold; margin-right: 8px; }
+        
+        /* 输入框与下拉框 */
+        select { padding: 5px; border-radius: 4px; border: 1px solid #ccc; }
+        .fill-blank { border: none; border-bottom: 1px solid #333; padding: 2px 5px; width: 220px; font-size: 1rem; outline: none; background: transparent; }
+
+        /* 判分反馈 */
+        .is-correct { background-color: var(--correct-bg) !important; border-left: 5px solid #4caf50 !important; }
+        .is-incorrect { background-color: var(--incorrect-bg) !important; border-left: 5px solid #f44336 !important; }
+
+        footer { padding: 15px 40px; border-top: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; background: white; }
+        .btn-submit { background: var(--ielts-teal); color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <header>
-        <span style="letter-spacing: 1px;">IELTS ACADEMIC READING</span>
-        <div class="timer-box" id="timer">60:00</div>
-    </header>
+<header>
+    <div style="font-weight: bold;">IELTS Reading Simulation</div>
+    <div class="timer-display" id="timer">60:00</div>
+</header>
 
-    <div class="main-container" id="content-area" style="display:none;">
-        <div class="passage">
-            <h2>Reading Passage</h2>
-            <p><strong>Ancient Societies Classification </strong></p>
-            <p>A     Sociologists and anthropologists classify societal groups based on their access to resources, prestige, or power. There are typically four classifications of society and this has been true throughout history. At the bottom end of the societal scale are clans, followed by tribes, chiefdoms — and at the highest are the states.
-<p> B  Clans consist of a small group of people who are typically hunters or gatherers. People in a group tend to number less than 100 and hold no specific home, which allows for flexibility in exploiting the wild and gathering food resources. Members of the clans are typically related to each other through marriage or descent and the group as a whole does not have any formal ranks of leadership. As such, the economic disparity is non-existent between different members due to the vast similarities.
-Today there are few societal groups that fit the profile, and most are relegated to areas like the Hadza of Tanzania. They are considered to be one of the last hunter-gatherer tribes within the African region and their population numbers 1300. Experts consider the small group to be very important as they best represent how humans existed and survived in the past. In fact, the Hadza hunters use many of the same methods that were used thousands of years ago. They hunt animals with bows and arrows that are hand-made and create their own shelter with dried grass and branches. As was the case centuries ago, they own very few possessions, especially compared to their modern day counterparts in Western societies.
-Clans are also very mobile and their short-term homes tend to be composed of seasonally occupied camps and other smaller or more specialised pieces of land. One thing that remains consistent is that clans seek out areas where large mammals can be killed and butchered. Equally as important for clans is access to make tools or perform other sensitive activities.<p>
-<p>C     Tribes are mostly larger than the mobile hunter-gatherer clan groups and it would be usual for a group to include a population above a few thousand. They tend to nourish mostly on cultivated plants and domesticated animals. People belonging to the tribe societal group are mostly farmers, but could also be nomadic with a mobile economy based on the exploitation of livestock. Tribes are generally multi-community societies, with the individual communities integrated into the large society through kinship ties.
-Some of the recovered evidence of tribes across the world includes the first farms of the Danube valley in Europe. Others include the Pueblos of the American Southwest, or the early farming village of Catalhoyuk which makes up part of modern Turkey. Although some tribes have officials and even a‘capital’or seat of government, such officials lack the economic base necessary for effective use of power.<p>
-<p>D     Chiefs are graded on a scale of prestige with senior members holding more power. The more senior chiefs are also tasked with governing the society. Prestige and rank are determined by how closely a person is related to a senior chief but there is no true stratification into classes.
-Chiefs also benefit from living in a centre of power with luxuries others barely have access to, in particular temples and residences. Chiefs obviously benefit the most from their power and prestige through surplus local craft products and food which are paid as a tribute. A chief could then keep the tribute to satisfy workers or redistribute them to his subjects. Chiefdoms typically vary greatly in size from one society to another, but a typical range is between 5000 and 20000 people.<p>
-<p>E      Statesmen share many of the characteristics of a chief but with one key difference. Statesmen tend to have absolute power as a king or a queen, which grants them explicit authority to create laws and enforce them through an armed force. The ruling lineage is viewed as the ultimate owner of the land and their luxuries extend beyond the temples enjoyed by chiefs. This is made possible by lower-ranked people who have an obligation to pay taxes to the statesmen.
-Statesmen are typically not far removed from capital houses where the bureaucratic administration enforces the collection of revenue and key responsibilities. A centralised location also allows for easier distribution of the revenue to other government members, armed forces, and craft specialists. Early states tend to have developed redistribution systems to best support the essential services and proper functioning of the government.<p>
-<p>F      Elman Service, William Sanders, and Joseph Marino are experts in the field of societal hierarchy and credited in part with discovering this knowledge. Service provides a good framework to help organise our thoughts on the topic through various papers and books. He, in particular, is credited with developing a ‘managerial benefits’ theory of society which hypothesises that societies with four levels of hierarchy including a centralised leadership were beneficial to all. At the top of the command, the statesmen or leaders offered benefits to the followers and over time these benefits grew in complexity and improved the whole society.<p>
-Service's research also led him to conclude that class war was not present in ancient civilisation. In fact, those on the lower-end of the societal scale were eager to volunteer and perform tasks instead of being forced to do so by the leadership. He also found that arguments or struggles took place among the political elite.</p>
+<div class="main-container">
+    <div class="passage">
+        <h2>Ancient societies classification</h2>
+        
+        <p><strong>A</strong> Sociologists and anthropologists classify societal groups based on their access to resources, prestige, or power. There are typically four classifications of society and this has been true throughout history. At the bottom end of the societal scale are clans, followed by tribes, chiefdoms — and at the highest are the states.</p>
+
+        <p><strong>B</strong> Clans consist of a small group of people who are typically hunters or gatherers. People in a group tend to number less than 100 and hold no specific home, which allows for flexibility in exploiting the wild and gathering food resources. Members of the clans are typically related to each other through marriage or descent and the group as a whole does not have any formal ranks of leadership. As such, the economic disparity is non-existent between different members due to the vast similarities.</p>
+
+        <p>Today there are few societal groups that fit the profile, and most are relegated to areas like the Hadza of Tanzania. They are considered to be one of the last hunter-gatherer tribes within the African region and their population numbers 1,300. Experts consider the small group to be very important as they best represent how humans existed and survived in the past. In fact, the Hadza hunters use many of the same methods that were used thousands of years ago. They hunt animals with bows and arrows that are hand-made and create their own shelter with dried grass and branches. As was the case centuries ago, they own very few possessions, especially compared to their modern day counterparts in Western societies.</p>
+
+        <p>Clans are also very mobile and their short-term homes tend to be composed of seasonally occupied camps and other smaller or more specialised pieces of land. One thing that remains consistent is that clans seek out areas where large mammals can be killed and butchered. Equally as important for clans is access to make tools or perform other sensitive activities.</p>
+
+        <p><strong>C</strong> Tribes are mostly larger than the mobile hunter-gatherer clan groups and it would be usual for a group to include a population above a few thousand. They tend to nourish mostly on cultivated plants and domesticated animals. People belonging to the tribe societal group are mostly farmers, but could also be nomadic with a mobile economy based on the exploitation of livestock. Tribes are generally multi-community societies, with the individual communities integrated into the large society through kinship ties.</p>
+
+        <p>Some of the recovered evidence of tribes across the world includes the first farms of the Danube valley in Europe. Others include the Pueblos of the American Southwest, or the early farming village of Catalhoyuk which makes up part of modern Turkey. Although some tribes have officials and even a ‘capital’ or seat of government, such officials lack the economic base necessary for effective use of power.</p>
+
+        <p><strong>D</strong> Chiefs are graded on a scale of prestige with senior members holding more power. The more senior chiefs are also tasked with governing the society. Prestige and rank are determined by how closely a person is related to a senior chief but there is no true stratification into classes.</p>
+
+        <p>Chiefs also benefit from living in a centre of power with luxuries others barely have access to, in particular temples and residences. Chiefs obviously benefit the most from their power and prestige through surplus local craft products and food which are paid as a tribute. A chief could then keep the tribute to satisfy workers or redistribute them to his subjects. Chiefdoms typically vary greatly in size from one society to another, but a typical range is between 5,000 and 20,000 people.</p>
+
+        <p><strong>E</strong> Statesmen share many of the characteristics of a chief but with one key difference. Statesmen tend to have absolute power as a king or a queen, which grants them explicit authority to create laws and enforce them through an armed force. The ruling lineage is viewed as the ultimate owner of the land and their luxuries extend beyond the temples enjoyed by chiefs. This is made possible by lower-ranked people who have an obligation to pay taxes to the statesmen.</p>
+
+        <p>Statesmen are typically not far removed from capital houses where the bureaucratic administration enforces the collection of revenue and key responsibilities. A centralised location also allows for easier distribution of the revenue to other government members, armed forces, and craft specialists. Early states tend to have developed redistribution systems to best support the essential services and proper functioning of the government.</p>
+
+        <p><strong>F</strong> Elman Service, William Sanders, and Joseph Marino are experts in the field of societal hierarchy and credited in part with discovering this knowledge. Service provides a good framework to help organise our thoughts on the topic through various papers and books. He, in particular, is credited with developing a ‘managerial benefits’ theory of society which hypothesises that societies with four levels of hierarchy including a centralised leadership were beneficial to all. At the top of the command, the statesmen or leaders offered benefits to the followers and over time these benefits grew in complexity and improved the whole society.</p>
+
+        <p>Service's research also led him to conclude that class war was not present in ancient civilisation. In fact, those on the lower-end of the societal scale were eager to volunteer and perform tasks instead of being forced to do so by the leadership. He also found that arguments or struggles took place among the political elite.</p>
+    </div>
+
+    <div class="questions">
+        <div class="question-section">
+            <h3>Questions 1-7</h3>
+            <p class="instruction">Do the following statements agree with the information given in Reading Passage 1?<br>
+            TRUE (If the statement agrees), FALSE (If contradicts), NOT GIVEN (If no information).</p>
+
+            <div class="q-item"><span class="q-num">1.</span> There is a hierarchy of economic power within clans. 
+                <select class="user-ans" data-answer="FALSE"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
+            <div class="q-item"><span class="q-num">2.</span> Only clans are considered nomadic. 
+                <select class="user-ans" data-answer="FALSE"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
+            <div class="q-item"><span class="q-num">3.</span> Tribes are supported by communities of people who are mostly connected through family relationships. 
+                <select class="user-ans" data-answer="TRUE"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
+            <div class="q-item"><span class="q-num">4.</span> In chiefdoms, residents offer items and foodstuffs to the chief. 
+                <select class="user-ans" data-answer="TRUE"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
+            <div class="q-item"><span class="q-num">5.</span> In a state, citizens are considered as owners of the land. 
+                <select class="user-ans" data-answer="FALSE"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
+            <div class="q-item"><span class="q-num">6.</span> Citizens have to pay taxes to their statesmen before they get benefits from their leaders. 
+                <select class="user-ans" data-answer="NOT GIVEN"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
+            <div class="q-item"><span class="q-num">7.</span> Early states benefit from their ability to easily redistribute capital. 
+                <select class="user-ans" data-answer="TRUE"><option value="">Select...</option><option value="TRUE">TRUE</option><option value="FALSE">FALSE</option><option value="NOT GIVEN">NOT GIVEN</option></select>
+            </div>
         </div>
 
-       <div class="questions">
-    
-    <section id="part1">
-        <h3>Questions 1-7</h3>
-        <p><em>Do the following statements agree with the information given in the Reading Passage? <br>
-        In boxes 1-7, select <strong>TRUE, FALSE</strong> or <strong>NOT GIVEN</strong>.</em></p>
+        <div class="question-section">
+            <h3>Questions 8-13</h3>
+            <p class="instruction">Answer the questions below. Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.</p>
 
-        <div class="q-item">
-            <span class="q-num">1.</span> 
-            There is a hierarchy of economic power within clans.
-            <select class="user-ans" data-answer="FALSE">
-                <option value="">Select...</option>
-                <option value="TRUE">TRUE</option>
-                <option value="FALSE">FALSE</option>
-                <option value="NOT GIVEN">NOT GIVEN</option>
-            </select>
+            <div class="q-item">8. In clans, what makes a group of people connected with each other? <br>
+                <input type="text" class="user-ans fill-blank" data-answer="marriage or descent"></div>
+            
+            <div class="q-item">9. What do the Hadza use to catch their prey? <br>
+                <input type="text" class="user-ans fill-blank" data-answer="bows and arrows"></div>
+
+            <div class="q-item">10. Where in Europe have archaeologists found examples of early farms? <br>
+                <input type="text" class="user-ans fill-blank" data-answer="the Danube valley"></div>
+
+            <div class="q-item">11. Which two items do chiefs have available to them that other members of society do not? <br>
+                <input type="text" class="user-ans fill-blank" data-answer="temples and residences"></div>
+
+            <div class="q-item">12. What do statesmen possess that differentiates them from chiefs? <br>
+                <input type="text" class="user-ans fill-blank" data-answer="absolute power"></div>
+
+            <div class="q-item">13. What did Service discover to be missing in ancient civilisations? <br>
+                <input type="text" class="user-ans fill-blank" data-answer="class war"></div>
         </div>
-
-        <div class="q-item">
-            <span class="q-num">2.</span> 
-            Only clans are considered nomadic.
-            <select class="user-ans" data-answer="FALSE">
-                <option value="">Select...</option>
-                <option value="TRUE">TRUE</option>
-                <option value="FALSE">FALSE</option>
-                <option value="NOT GIVEN">NOT GIVEN</option>
-            </select>
-        </div>
-        </section>
-
-    <hr>
-
-    <section id="part2">
-        <h3>Questions 8-13</h3>
-        <p><em>Answer the questions below <br>
-        Choose <strong>NO MORE THAN THREE WORDS</strong> from the passage for each answer.
-        Write your answers in boxes 8-13 on your answer sheet.</em></p>
-
-        <div class="q-item">
-            <span class="q-num">8.</span> 
-            In clans, what makes a group of people connected with each other? 
-            <input type="text" class="user-ans" data-answer="recycled materials" placeholder="Max 3 words">.
-        </div>
-
-        <div class="q-item">
-            <span class="q-num">9.</span> 
-            What do the Hadza use to catch their prey?  
-            <input type="text" class="user-ans" data-answer="public solar power" placeholder="Max 3 words">.
-        </div>
-        </section>
-
+    </div>
 </div>
 
-    <footer>
-        <button class="btn-submit" onclick="checkAnswers()">Submit & Check</button>
-    </footer>
+<footer>
+    <div id="score-report" style="font-weight: bold; color: var(--ielts-teal);"></div>
+    <button class="btn-submit" onclick="calculateScore()">Submit and Check</button>
+</footer>
 
-    <script>
-        // 1. 简易访问密码 (你可以修改 "8585")
-        const pass = prompt("Access Code:");
-        if (pass === "zz2015") {
-            document.getElementById('content-area').style.display = 'flex';
-        } else {
-            alert("Wrong code.");
-            document.body.innerHTML = "<h1>Unauthorized Access</h1>";
-        }
+<script>
+    function calculateScore() {
+        const questions = document.querySelectorAll('.user-ans');
+        let score = 0;
 
-        // 2. 计时器逻辑
-        let timeLeft = 3600;
-        setInterval(() => {
-            if (timeLeft <= 0) return;
-            timeLeft--;
-            let m = Math.floor(timeLeft / 60);
-            let s = timeLeft % 60;
-            document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-        }, 1000);
+        questions.forEach(q => {
+            const userVal = q.value.trim().toLowerCase();
+            const correctVal = q.getAttribute('data-answer').toLowerCase();
+            const container = q.closest('.q-item');
 
-        // 3. 自动判分逻辑
-        function checkAnswers() {
-            const inputs = document.querySelectorAll('.user-ans');
-            let score = 0;
+            if (userVal === correctVal && userVal !== "") {
+                container.classList.add('is-correct');
+                container.classList.remove('is-incorrect');
+                score++;
+            } else {
+                container.classList.add('is-incorrect');
+                container.classList.remove('is-correct');
+            }
+        });
 
-            inputs.forEach(input => {
-                const userAnswer = input.value.trim().toLowerCase();
-                const correctAnswer = input.getAttribute('data-answer').toLowerCase();
-                const parentDiv = input.parentElement;
+        document.getElementById('score-report').innerText = `Final Score: ${score} / ${questions.length}`;
+        alert(`Finished! Score: ${score}/${questions.length}. Incorrect answers are highlighted in red.`);
+    }
 
-                if (userAnswer === correctAnswer) {
-                    parentDiv.className = 'q-item correct';
-                    score++;
-                } else {
-                    parentDiv.className = 'q-item incorrect';
-                }
-            });
-
-            alert(`You got ${score} out of ${inputs.length} correct!`);
-        }
-    </script>
+    // Timer logic
+    let timeLeft = 3600;
+    setInterval(() => {
+        if(timeLeft <= 0) return;
+        timeLeft--;
+        let m = Math.floor(timeLeft / 60);
+        let s = timeLeft % 60;
+        document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+    }, 1000);
+</script>
+// 1. 访问密码控制 (放在脚本最前面)
+const secret = prompt("请输入访问密码以开始练习:");
+if (secret !== "zz2015") { 
+    alert("密码错误！");
+    document.body.innerHTML = "<h1 style='text-align:center; margin-top:100px; color:#00717a;'>需授权访问：请输入正确密码。</h1>";
+    throw new Error("Unauthorized"); // 停止后续脚本运行
+}
 </body>
 </html>
